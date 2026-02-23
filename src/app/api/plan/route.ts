@@ -4,6 +4,15 @@ import { z } from "zod";
 
 export const runtime = "nodejs";
 
+type ResponsesCreateParams = Parameters<OpenAI["responses"]["create"]>[0];
+
+type StructuredResponseParams = ResponsesCreateParams & {
+  response_format?: {
+    type: "json_schema";
+    json_schema: Record<string, unknown>;
+  };
+};
+
 const planInputSchema = z.object({
   scenario: z.string().min(20, "Provide at least 20 characters of context."),
   location: z.string().min(2, "Location is required."),
@@ -71,7 +80,7 @@ Assets & gaps: ${assets}
 Planning horizon: ${timebox} hours
 `;
 
-    const completion = await openai.responses.create({
+    const payload = {
       model: "gpt-4.1-mini",
       input: [
         {
@@ -143,9 +152,21 @@ Planning horizon: ${timebox} hours
           },
         },
       },
-    });
+    } as StructuredResponseParams;
 
-    const output = completion.output?.[0]?.content?.find(
+    const completion = await openai.responses.create(payload);
+
+    if (!("output" in completion)) {
+      throw new Error("Streaming response not supported in this route.");
+    }
+
+    const firstMessage = completion.output?.[0];
+
+    if (!firstMessage || firstMessage.type !== "message") {
+      throw new Error("Model did not return message content.");
+    }
+
+    const output = firstMessage.content.find(
       (block) => block.type === "output_text",
     );
 

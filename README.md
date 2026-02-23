@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## OpsWeaver
 
-## Getting Started
+OpsWeaver is a hackathon-ready crisis operations board that turns raw field updates into a synchronized mission thread for emergency managers. Responders paste the situation, assets, and planning horizon, then the app uses OpenAI’s JSON-mode Responses API to output a runbook with timeline phases, resource gaps, risk radar, and a broadcast-ready comms kit. Every sync is cached locally so command posts can refresh the same shared operating picture within seconds.
 
-First, run the development server:
+### Key features
+
+- **AI Incident Action Planning** – Structured JSON schema enforces high-signal timelines, resource math, and lifeline metrics pulled straight from your scenario.
+- **Decision Snapshot UI** – Shadcn components, responsive cards, and animated loaders keep the experience demo-ready on stage or in a field trailer.
+- **Local persistence** – The latest mission thread survives hard refreshes via browser storage so teams can resume without exporting files.
+- **Vercel-friendly** – Bun, Next.js App Router, and iframe-safe headers allow instant deploys and judge-friendly embeds.
+
+### Prerequisites
+
+- [Bun](https://bun.sh) ≥ 1.0
+- Node.js 18+ runtime (Vercel builds on ≥18 automatically)
+- `OPENAI_API_KEY` available in your environment (Anthropic/OpenRouter also work if you swap the provider)
+
+Create an `.env.local` with:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+OPENAI_API_KEY=sk-your-key
+```
+
+### Development
+
+```bash
+# install deps
+bun install
+
+# run linting
+bun run lint
+
+# start dev server
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000` to drive the experience. The command panel will persist your latest plan between refreshes.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production build / verification
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+OpsWeaver follows the TreeHacks verification ritual:
 
-## Learn More
+```bash
+rm -rf node_modules
+bun install
+bun run lint
+bun run build
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+If build succeeds you’re ready to `vercel deploy` or rely on the automatic deployment triggered by `treemux-report`.
