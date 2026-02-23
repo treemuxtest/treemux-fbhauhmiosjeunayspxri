@@ -49,13 +49,13 @@ export async function POST(request: Request) {
       input: [
         {
           role: "system",
-          content: [{ type: "text", text: systemPrompt }],
+          content: [{ type: "input_text", text: systemPrompt }],
         },
         {
           role: "user",
           content: [
             {
-              type: "text",
+              type: "input_text",
               text: JSON.stringify({
                 brief: parsedBrief,
                 request:
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       ],
       temperature: 0.4,
       response_format: { type: "json_schema", json_schema: planJsonSchema },
-    });
+    } as any);
 
     const payload = aiResponse.output_text;
 
