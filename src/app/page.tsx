@@ -30,39 +30,14 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Brief,
+  PulsePlan,
+  ResourceGap,
+  channelOptions,
+  fallbackPlan,
+} from "@/lib/pulse";
 import { cn } from "@/lib/utils";
-
-type Brief = {
-  scenario: string;
-  incidentType: "infrastructure" | "health" | "climate" | "safety";
-  location: string;
-  population: number;
-  hoursToImpact: number;
-  severity: number;
-  commsChannels: string[];
-};
-
-type TimelineItem = {
-  phase: string;
-  window: string;
-  tasks: string[];
-};
-
-type ResourceGap = {
-  asset: string;
-  owner: string;
-  status: "ready" | "lagging" | "blocked";
-  impact: string;
-};
-
-type PulsePlan = {
-  summary: string;
-  signalThemes: string[];
-  confidence: number;
-  timeline: TimelineItem[];
-  resourceGaps: ResourceGap[];
-  commsAngles: string[];
-};
 
 const defaultBrief: Brief = {
   scenario:
@@ -75,75 +50,9 @@ const defaultBrief: Brief = {
   commsChannels: ["SMS", "Radio", "CERT"],
 };
 
-const seedPlan: PulsePlan = {
-  summary:
-    "Stabilize heat exhaustion risk within 6 hours by splitting inbound volume, deploying paramedic strike teams, and spinning up multilingual comms loops.",
-  signalThemes: [
-    "Cooling infrastructure saturation",
-    "Language access gap",
-    "Limited advanced life support coverage",
-  ],
-  confidence: 74,
-  timeline: [
-    {
-      phase: "Stabilize",
-      window: "0-2 hrs",
-      tasks: [
-        "Trigger overflow site with Parks & Rec keyholder",
-        "Pre-stage 2 ALS rigs near Route 87",
-        "Spin bilingual SMS blast w/ hydration tips",
-      ],
-    },
-    {
-      phase: "Absorb",
-      window: "2-6 hrs",
-      tasks: [
-        "Move CERT volunteers to intake triage",
-        "Offer ride credits for vulnerable residents",
-        "Deploy shade + misting kit from Depot 3",
-      ],
-    },
-    {
-      phase: "Recover",
-      window: "6-12 hrs",
-      tasks: [
-        "Publish after-action status for county EOC",
-        "Reset med caches; confirm replenishment ETA",
-      ],
-    },
-  ],
-  resourceGaps: [
-    {
-      asset: "ALS Paramedic Team",
-      owner: "County EMS",
-      status: "lagging",
-      impact: "Need 2 crews to sustain split coverage",
-    },
-    {
-      asset: "Hydration Pallets",
-      owner: "Salvation Relief",
-      status: "ready",
-      impact: "Available within 35 min at Depot 3",
-    },
-    {
-      asset: "Spanish-first Comms Lead",
-      owner: "City PIO",
-      status: "blocked",
-      impact: "Reassign bilingual staff from 311 desk",
-    },
-  ],
-  commsAngles: [
-    "30-second mayor voicemail for seniors",
-    "TikTok + IG reels translating heat safety",
-    "Hospital bed availability ping to dispatch",
-  ],
-};
-
-const channelOptions = ["SMS", "Email", "Push", "CERT", "Radio", "Social"];
-
 export default function Home() {
   const [brief, setBrief] = useState<Brief>(defaultBrief);
-  const [draftPlan, setDraftPlan] = useState<PulsePlan>(seedPlan);
+  const [draftPlan, setDraftPlan] = useState<PulsePlan>(fallbackPlan);
   const [isLoading, setIsLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
@@ -189,7 +98,7 @@ export default function Home() {
     } catch (error) {
       console.error(error);
       setAiError("Live plan failed, showing resilient template.");
-      setDraftPlan(seedPlan);
+      setDraftPlan(fallbackPlan);
     } finally {
       setIsLoading(false);
     }
